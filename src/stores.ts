@@ -261,6 +261,9 @@ export const useDBStore = create<State>()(
           method: "POST",
           body: JSON.stringify(req),
         });
+        if (!resp.ok) {
+          throw new Error(`EOPA: ${resp.statusText}`);
+        }
         const result = await resp.json();
 
         if ("code" in result) {

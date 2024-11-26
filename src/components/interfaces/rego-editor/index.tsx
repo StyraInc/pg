@@ -70,7 +70,9 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
         .getState()
         .execute(query)
         .then(() => toast.success("completed", { duration: 500 }))
-        .catch((err) => toast.error((err as Error).message, { duration: 500 }));
+        .catch((err) =>
+          toast.error((err as Error).message, { duration: 2000 }),
+        );
 
     const runAllQueryFiltered = () =>
       query &&
@@ -78,7 +80,9 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
         .getState()
         .execute(query, rego, true)
         .then(() => toast.success("completed", { duration: 500 }))
-        .catch((err) => toast.error((err as Error).message, { duration: 500 }));
+        .catch((err) =>
+          toast.error((err as Error).message, { duration: 2000 }),
+        );
 
     const evalQuery = () =>
       rego &&
