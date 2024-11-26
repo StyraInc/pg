@@ -62,7 +62,7 @@ export const QueryPlayground = forwardRef<
     query &&
     useDBStore
       .getState()
-      .execute(query, true)
+      .execute(query, undefined, true)
       .then(() => toast.success("completed", { duration: 500 }))
       .catch((err) => toast.error((err as Error).message, { duration: 500 }));
 

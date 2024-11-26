@@ -10,7 +10,6 @@ import { useIsDesktop } from "./components/hooks/use-is-desktop";
 import { Header, HeaderLogo } from "@/components/layouts/header";
 import { ThemeSwitcher } from "./components/layouts/theme-switcher";
 import { QueryHistory } from "@/components/interfaces/query-history";
-import { QueryPlayground } from "@/components/interfaces/query-playground";
 import { Navigation, NavigationItem } from "@/components/layouts/navigation";
 import { DatabaseList } from "@/components/interfaces/database-setup/database-list";
 import {
