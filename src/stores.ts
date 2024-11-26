@@ -115,7 +115,8 @@ interface State {
 // NOTE(sr):
 // 1. "package conditions" and "query" is a must
 // 2. we need the rego.v1 import because the Preview API has no "v1" flag
-const defaultRego = `package conditions
+let rego = new Map<string, string>();
+rego.set("orders", `package conditions
 import rego.v1
 
 filter["users.name"] := input.user
@@ -123,8 +124,22 @@ filter["products.price"] := {"lte": 500} if input.budget == "low"
 
 expanded := ucast.expand(filter)
 query := ucast.as_sql(expanded, "postgres", {"users": {"$self": "u"}, "products": {"$self": "p"}})
-`;
-const defaultInput = { user: "Emma Clark", budget: "low" };
+`);
+const defaultRego = "";
+
+let inputs = new Map<string, object>();
+inputs.set("orders", { user: "Emma Clark", budget: "low" });
+const defaultInput = {};
+
+let sql = new Map<string, string>();
+sql.set("orders", `
+select u.name as user, p.name as product, p.price
+from orders o
+inner join users u on o.user_id = u.id
+inner join order_items i on o.order_id = i.order_id
+inner join products p on i.product_id = p.product_id
+`)
+const defaultSql = "SELECT * FROM information_schema.tables";
 
 /* NOTE(sr): the example rego above is meant to go with this SQL statement:
 select u.name as user, p.name as product, p.price
@@ -179,7 +194,7 @@ export const useDBStore = create<State>()(
         }),
 
       import: async (data) => {
-        const sql = await getSampleDatabaseQuery(data.key);
+        const sqlCreateQuery = await getSampleDatabaseQuery(data.key);
 
         /**
          * name with random 5 digit string
@@ -191,11 +206,19 @@ export const useDBStore = create<State>()(
         /**
          * import data
          */
-        await postgres.exec(sql);
+        await postgres.exec(sqlCreateQuery);
 
         const schema = await getDatabaseSchema(postgres);
 
         const erd = await generateMermaidErd(postgres);
+
+        /**
+         * prepare panes
+         */
+        let e = data.key;
+        let r = rego.get(e) ? rego.get(e)! : defaultRego;
+        let s = sql.get(e) ? sql.get(e)! : defaultSql;
+        let i = inputs.get(e) ? inputs.get(e)! : defaultInput;
 
         set((state) => {
           state.active = {
@@ -207,9 +230,9 @@ export const useDBStore = create<State>()(
             name: name,
             description: data.description,
             createdAt: new Date().toLocaleString(),
-            query: "SELECT * FROM information_schema.tables",
-            rego: defaultRego,
-            input: defaultInput,
+            query: s,
+            rego: r,
+            input: i,
             history: [],
             erd: erd,
             schema: schema,
