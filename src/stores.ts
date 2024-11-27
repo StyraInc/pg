@@ -391,7 +391,7 @@ function combine(existing: string, filter: string | undefined): string {
 
   const sansWhere = filter.slice(6);
   if (/where/i.test(existing)) {
-    return existing + " AND " + sansWhere;
+    return existing + "\nAND " + sansWhere;
   }
-  return existing + " WHERE " + sansWhere;
+  return existing + "\nWHERE " + sansWhere;
 }
