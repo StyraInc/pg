@@ -107,7 +107,7 @@ interface State {
     filter?: boolean
   ) => Promise<Results[] | undefined>;
 
-  evaluate: (rego: string) => Promise<Record<string, any> | undefined>;
+  evaluate: (rego: string) => Promise<Record<string, unknown> | undefined>;
 
   reload: () => Promise<void>;
 }
