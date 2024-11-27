@@ -185,7 +185,7 @@ export const QueryPlayground = forwardRef<
 
                     editor.current.addCommand(
                       monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
-                      runSelectedQuery,
+                      runSelectedQuery
                     );
                   }}
                   options={{

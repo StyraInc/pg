@@ -24,10 +24,10 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
     const rego = useDBStore((s) => s.databases[s.active!.name].rego);
     const datagrid = useDBStore((s) => s.databases[s.active!.name].datagrid);
     const input = useDBStore((s) =>
-      JSON.stringify(s.databases[s.active!.name].input, null, 2),
+      JSON.stringify(s.databases[s.active!.name].input, null, 2)
     );
     const data = useDBStore((s) =>
-      JSON.stringify(s.databases[s.active!.name].data, null, 2),
+      JSON.stringify(s.databases[s.active!.name].data, null, 2)
     );
     const evaluated = useDBStore((s) => {
       const res = s.databases[s.active!.name].evaluated;
@@ -44,7 +44,7 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
       useDBStore.setState((s) => {
         try {
           s.databases[s.active!.name].input = input ? JSON.parse(input) : {};
-        } catch (err) {
+        } catch (_) {
           // NOTE(sr): too noisy, we don't debounce setInput; better ignore parse errors
           // toast.error((err as Error).message, { duration: 2000 });
         }
@@ -54,7 +54,7 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
       useDBStore.setState((s) => {
         try {
           s.databases[s.active!.name].data = data ? JSON.parse(data) : {};
-        } catch (err) {
+        } catch (_) {
           // NOTE(sr): too noisy, see setInput above
         }
       });
@@ -71,7 +71,7 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
         .execute(query)
         .then(() => toast.success("completed", { duration: 500 }))
         .catch((err) =>
-          toast.error((err as Error).message, { duration: 2000 }),
+          toast.error((err as Error).message, { duration: 2000 })
         );
 
     const runAllQueryFiltered = () =>
@@ -81,7 +81,7 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
         .execute(query, rego, true)
         .then(() => toast.success("completed", { duration: 500 }))
         .catch((err) =>
-          toast.error((err as Error).message, { duration: 2000 }),
+          toast.error((err as Error).message, { duration: 2000 })
         );
 
     const evalQuery = () =>
@@ -91,7 +91,7 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
         .evaluate(rego)
         .then(() => toast.success("completed", { duration: 500 }))
         .catch((err) =>
-          toast.error((err as Error).message, { duration: 2000 }),
+          toast.error((err as Error).message, { duration: 2000 })
         );
 
     return (
@@ -257,5 +257,5 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
         </ResizablePanelGroup>
       </div>
     );
-  },
+  }
 );

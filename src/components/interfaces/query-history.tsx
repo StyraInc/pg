@@ -76,7 +76,7 @@ export const QueryHistory = forwardRef<HTMLDivElement, ComponentProps<"div">>(
               <div
                 className={cn(
                   "flex size-5 items-center justify-center rounded-full",
-                  log.error ? "bg-destructive" : "bg-primary",
+                  log.error ? "bg-destructive" : "bg-primary"
                 )}
               >
                 <div className="size-3 rounded-full bg-background" />
@@ -85,7 +85,7 @@ export const QueryHistory = forwardRef<HTMLDivElement, ComponentProps<"div">>(
                 <div
                   className={cn(
                     "flex-1 border-[1.5px] border-r border-dashed",
-                    log.error ? "border-destructive/50" : "border-primary/50",
+                    log.error ? "border-destructive/50" : "border-primary/50"
                   )}
                 />
               )}
@@ -146,5 +146,5 @@ export const QueryHistory = forwardRef<HTMLDivElement, ComponentProps<"div">>(
         ))}
       </div>
     );
-  },
+  }
 );

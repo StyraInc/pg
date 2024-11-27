@@ -104,7 +104,7 @@ interface State {
   execute: (
     query: string,
     rego?: string,
-    filter?: boolean,
+    filter?: boolean
   ) => Promise<Results[] | undefined>;
 
   evaluate: (rego: string) => Promise<Record<string, any> | undefined>;
@@ -379,8 +379,8 @@ export const useDBStore = create<State>()(
       name: "zustand-store",
       storage: createJSONStorage(() => zustandIDBStorage),
       partialize: (state) => ({ databases: state.databases }),
-    },
-  ),
+    }
+  )
 );
 
 function combine(existing: string, filter: string | undefined): string {
