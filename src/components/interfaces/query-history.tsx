@@ -76,7 +76,7 @@ export const QueryHistory = forwardRef<HTMLDivElement, ComponentProps<"div">>(
               <div
                 className={cn(
                   "flex size-5 items-center justify-center rounded-full",
-                  log.error ? "bg-destructive" : "bg-primary",
+                  log.error ? "bg-destructive" : "bg-primary"
                 )}
               >
                 <div className="size-3 rounded-full bg-background" />
@@ -85,7 +85,7 @@ export const QueryHistory = forwardRef<HTMLDivElement, ComponentProps<"div">>(
                 <div
                   className={cn(
                     "flex-1 border-[1.5px] border-r border-dashed",
-                    log.error ? "border-destructive/50" : "border-primary/50",
+                    log.error ? "border-destructive/50" : "border-primary/50"
                   )}
                 />
               )}
@@ -95,7 +95,7 @@ export const QueryHistory = forwardRef<HTMLDivElement, ComponentProps<"div">>(
                 <div className="font-bold text-xs">{log.createdAt}</div>
                 <Badge>{log.executionTime} ms</Badge>
               </div>
-              <div className="flex flex-col gap-2 lg:flex-row p-2">
+              <div className="flex·flex-col·gap-2·p-2·lg:flex-row">
                 <div className="relative flex-1 lg:overflow-hidden">
                   <Button
                     size="icon"
@@ -124,9 +124,9 @@ export const QueryHistory = forwardRef<HTMLDivElement, ComponentProps<"div">>(
                   ))}
                 </ul>
               </div>
-              <div className="flex flex-row items-center justify-between gap-2 border-b border-t py-2 font-mono">
+              <div className="flex·flex-row·items-center·justify-between·gap-2·border-t·border-b·py-2·font-mono">
                 {log.statementWithFilter && (
-                  <div className="relative flex-1 lg:overflow-hidden p-2">
+                  <div className="relative flex-1 p-2 lg:overflow-hidden">
                     <Button
                       size="icon"
                       variant="outline"
@@ -146,5 +146,5 @@ export const QueryHistory = forwardRef<HTMLDivElement, ComponentProps<"div">>(
         ))}
       </div>
     );
-  },
+  }
 );
