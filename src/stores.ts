@@ -126,10 +126,20 @@ filter["products.price"] := {"lte": 500} if input.budget == "low"
 expanded := ucast.expand(filter)
 query := ucast.as_sql(expanded, "postgres", {"users": {"$self": "u"}, "products": {"$self": "p"}})
 `,
-  schools: defaultRego,
+  schools: `package conditions
+import rego.v1
+
+filter["students.name"] := input.user
+
+expanded := ucast.expand(filter)
+query := ucast.as_sql(expanded, "postgres", {"students": {"$self": "s1"}})
+`,
 };
 
-const inputs = { orders: { user: "Emma Clark", budget: "low" }, schools: {} };
+const inputs = {
+  orders: { user: "Emma Clark", budget: "low" },
+  schools: { user: "Emma Johnson" },
+};
 const defaultInput = {};
 
 const defaultSql = "SELECT * FROM information_schema.tables";
@@ -140,7 +150,12 @@ inner join users u on o.user_id = u.id
 inner join order_items i on o.order_id = i.order_id
 inner join products p on i.product_id = p.product_id
 `,
-  schools: defaultSql,
+  schools: `SELECT DISTINCT s2.*
+FROM student_subjects ss1
+NATURAL JOIN students s1
+JOIN student_subjects ss2 ON ss1.subject_id = ss2.subject_id
+JOIN students s2 ON ss2.student_id = s2.student_id
+`,
 };
 
 export const useDBStore = create<State>()(
