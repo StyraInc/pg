@@ -107,7 +107,9 @@ interface State {
     filter?: boolean
   ) => Promise<Results[] | undefined>;
 
-  evaluate: (rego: string) => Promise<Record<string, unknown> | undefined>;
+  evaluate: (
+    rego: string
+  ) => Promise<Record<string, Record<string, unknown>> | undefined>;
 
   reload: () => Promise<void>;
 }
@@ -317,7 +319,8 @@ export const useDBStore = create<State>()(
         const startTime = performance.now();
         const createdAt = new Date().toLocaleString();
 
-        const evalFilter = rego && (await get().evaluate(rego))?.result?.query;
+        const evalFilter =
+          rego && ((await get().evaluate(rego))?.result?.query as string);
 
         try {
           if (!query || !query.trim()) throw new Error(`no query to run`);
