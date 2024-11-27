@@ -16,6 +16,7 @@ services:
       - --server
       - --addr=:8181
       - --log-level=debug
+      - --no-license-fallback
       - --set=preview.enable=true
     environment:
       EOPA_LICENSE_KEY: ${EOPA_LICENSE_KEY}
