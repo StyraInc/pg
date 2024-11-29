@@ -1,4 +1,6 @@
 import { useDBStore } from "@/stores";
+import { Monaco } from "@monaco-editor/react";
+import type monaco from "monaco-editor";
 import { cn } from "@/utils/classnames";
 import { DataViewer } from "../query-playground/data-viewer";
 import { toast } from "@/components/ui/sonner";
@@ -17,6 +19,130 @@ import {
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
 import { IconPlayerPlay, IconDotsVertical } from "@tabler/icons-react";
+
+const Rego = "rego";
+
+// type Monaco = typeof monaco;
+
+export const configuration: monaco.languages.LanguageConfiguration = {
+  brackets: [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+  ],
+  autoClosingPairs: [
+    { open: "{", close: "}" },
+    { open: "[", close: "]" },
+    { open: "(", close: ")" },
+    { open: "`", close: "`", notIn: ["string"] }, // TODO(sr): these string pairs don't seem to work
+    { open: '"', close: '"', notIn: ["string"] },
+  ],
+  surroundingPairs: [
+    { open: "{", close: "}" },
+    { open: "[", close: "]" },
+    { open: "(", close: ")" },
+    { open: "`", close: "`" },
+    { open: '"', close: '"' },
+  ],
+  comments: {
+    lineComment: "#",
+  },
+  wordPattern: /\w+/,
+};
+
+// https://github.com/tatomyr/estimate-it/blob/master/src/components/Estimate/Editor.js
+export const languageDef: monaco.languages.IMonarchLanguage = {
+  defaultToken: "",
+  // we include these common regular expressions
+  symbols: /[=><!~?:&|+\-*\/\^%]+/,
+  escapes:
+    /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
+  operators: ["+", "-", "*", "/", "&", "|", "==", "!=", "="],
+  tokenizer: {
+    root: [
+      // identifiers and keywords
+      [
+        /[a-zA-Z_]\w*/,
+        {
+          cases: {
+            "@keywords": { token: "keyword.$0" },
+            "@default": "identifier",
+          },
+        },
+      ],
+
+      // whitespace
+      { include: "@whitespace" },
+
+      // delimiters and operators
+      [/[{}()\[\]]/, "@brackets"],
+      [/[<>](?!@symbols)/, "@brackets"],
+      [
+        /@symbols/,
+        {
+          cases: {
+            "@operators": "delimiter",
+            "@default": "",
+          },
+        },
+      ],
+
+      // numbers
+      [/\d*\d+[eE]([\-+]?\d+)?/, "number.float"],
+      [/\d*\.\d+([eE][\-+]?\d+)?/, "number.float"],
+      [/0[xX][0-9a-fA-F']*[0-9a-fA-F]/, "number.hex"],
+      [/0[0-7']*[0-7]/, "number.octal"],
+      [/0[bB][0-1']*[0-1]/, "number.binary"],
+      [/\d[\d']*/, "number"],
+      [/\d/, "number"],
+
+      // delimiter: after number because of .\d floats
+      [/[;,.]/, "delimiter"],
+
+      // strings
+      [/"([^"\\]|\\.)*$/, "string.invalid"], // non-teminated string
+      [/"/, "string", "@string"],
+      [/`/, "string", "@rawstring"],
+    ],
+
+    whitespace: [
+      [/[ \t\r\n]+/, ""],
+      [/#.*$/, "comment"],
+    ],
+
+    string: [
+      [/[^\\"]+/, "string"],
+      [/@escapes/, "string.escape"],
+      [/\\./, "string.escape.invalid"],
+      [/"/, "string", "@pop"],
+    ],
+
+    rawstring: [
+      [/[^\`]/, "string"],
+      [/`/, "string", "@pop"],
+    ],
+  },
+  keywords: [
+    "as",
+    "contains",
+    "default",
+    "else",
+    "every",
+    "if",
+    "in",
+    "import",
+    "package",
+    "not",
+    "some",
+    "with",
+  ],
+};
+
+function initializeEditor(monaco: Monaco) {
+  monaco.languages.register({ id: Rego });
+  monaco.languages.setMonarchTokensProvider(Rego, languageDef);
+  monaco.languages.setLanguageConfiguration(Rego, configuration);
+}
 
 export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
   ({ className, ...props }, ref) => {
@@ -187,10 +313,11 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
                   <div className="p-1 font-semibold">Rego</div>
                   <CodeEditor
                     value={rego}
-                    language="rego"
+                    language={Rego}
                     onChange={setRego}
+                    beforeMount={initializeEditor}
                     className="bg-muted"
-                    defaultLanguage="rego"
+                    defaultLanguage={Rego}
                     options={{
                       folding: true,
                       lineNumbers: "on",
