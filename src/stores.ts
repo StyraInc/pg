@@ -86,6 +86,10 @@ export interface Database {
   datagrid?: DataGridValue<Cell>[];
 }
 
+type EvalResult = {
+  result?: Record<string, unknown>;
+};
+
 interface State {
   active: Connection | undefined;
 
@@ -107,9 +111,7 @@ interface State {
     filter?: boolean
   ) => Promise<Results[] | undefined>;
 
-  evaluate: (
-    rego: string
-  ) => Promise<Record<string, Record<string, unknown>> | undefined>;
+  evaluate: (rego: string) => Promise<EvalResult>;
 
   reload: () => Promise<void>;
 }
