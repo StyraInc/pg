@@ -127,16 +127,14 @@ import rego.v1
 filter["users.name"] := input.user
 filter["products.price"] := {"lte": 500} if input.budget == "low"
 
-expanded := ucast.expand(filter)
-query := ucast.as_sql(expanded, "postgres", {"users": {"$self": "u"}, "products": {"$self": "p"}})
+query := ucast.as_sql(filter, "postgres", {"users": {"$self": "u"}, "products": {"$self": "p"}})
 `,
   schools: `package conditions
 import rego.v1
 
 filter["students.name"] := input.user
 
-expanded := ucast.expand(filter)
-query := ucast.as_sql(expanded, "postgres", {"students": {"$self": "s1"}})
+query := ucast.as_sql(filter, "postgres", {"students": {"$self": "s1"}})
 `,
 };
 
