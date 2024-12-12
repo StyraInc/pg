@@ -1,12 +1,12 @@
 import { useDBStore } from "@/stores";
-import { Monaco } from "@monaco-editor/react";
+import { Monaco, OnMount } from "@monaco-editor/react";
 import type monaco from "monaco-editor";
 import { cn } from "@/utils/classnames";
 import { DataViewer } from "../query-playground/data-viewer";
 import { toast } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { CodeEditor } from "@/components/ui/code-editor";
-import { forwardRef, ComponentProps } from "react";
+import { forwardRef, ComponentProps, useRef } from "react";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -144,6 +144,19 @@ function initializeEditor(monaco: Monaco) {
   monaco.languages.setLanguageConfiguration(Rego, configuration);
 }
 
+function _handleEditorMount(editor, monaco: Monaco) {
+  monaco.editor.setModelMarkers(editor.getModel(), "test", [
+    {
+      startLineNumber: 1,
+      startColumn: 10,
+      endLineNumber: -1,
+      endColumn: -1,
+      message: "a message",
+      severity: monaco.MarkerSeverity.Error,
+    },
+  ]);
+}
+
 export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
   ({ className, ...props }, ref) => {
     const query = useDBStore((s) => s.databases[s.active!.name].query);
@@ -160,6 +173,24 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
       if (!res) return;
       return JSON.stringify(res, null, 2);
     });
+
+    const handleEditorMount = (editor, monaco) => {
+      const s = useDBStore.getState();
+      const errors = s.databases[s.active!.name].errors;
+      console.error(errors);
+      errors?.forEach(({ message, col, row }) => {
+        monaco.editor.setModelMarkers(editor.getModel(), "test", [
+          {
+            startLineNumber: row,
+            startColumn: col,
+            endLineNumber: -1,
+            endColumn: -1,
+            message,
+            severity: monaco.MarkerSeverity.Error,
+          },
+        ]);
+      });
+    };
 
     const setRego = (rego: string | undefined) =>
       useDBStore.setState((s) => {
@@ -318,6 +349,7 @@ export const RegoEditor = forwardRef<HTMLDivElement, ComponentProps<"div">>(
                     beforeMount={initializeEditor}
                     className="bg-muted"
                     defaultLanguage={Rego}
+                    onMount={handleEditorMount}
                     options={{
                       folding: true,
                       lineNumbers: "on",
