@@ -73,6 +73,8 @@ export interface Database {
 
   query?: string;
 
+  errors?: { message: string; row: number; col: number }[];
+
   rego?: string;
 
   input?: Record<string, unknown>;
@@ -188,11 +190,13 @@ partial_eval(inp, unknowns, query) := http.send({
 	},
 }).body
 
-to_conditions(inp, unknowns, query) := conds if {
-	pe := partial_eval(inp, unknowns, query)
-	not pe.result.support # "support modules" are not supported right now
+to_conditions(inp, unknowns, query) := conds(partial_eval(inp, unknowns, query))
 
-	conds := or_({query_to_condition(q) | some q in pe.result.queries})
+conds(pe) := pe if pe.code
+conds(pe) := res if {
+  not pe.code
+	not pe.result.support # "support modules" are not supported right now
+	res := or_({query_to_condition(q) | some q in pe.result.queries})
 }
 
 query_to_condition(q) := and_({expr_to_condition(e) | some e in q})
@@ -393,6 +397,23 @@ export const useDBStore = create<State>()(
 
         if ("code" in result) {
           throw new Error(result?.message);
+        }
+
+        const { conditions } = result?.result;
+        if ("code" in conditions) {
+          set((state) => {
+            const errors = conditions.errors.map(
+              ({ message, location: { row, col } }) => ({ message, row, col })
+            );
+            console.dir({ errors }, { depth: null });
+            state.databases[connection.name].errors = errors;
+            return result;
+          });
+          throw new Error(
+            `${conditions.message}: ${conditions.errors
+              .map((e) => `${e.message} at ${e.location.row}`)
+              .join("; ")}`
+          );
         }
 
         set((state) => {
